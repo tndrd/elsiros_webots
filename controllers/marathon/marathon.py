@@ -7,6 +7,7 @@ import json
 from controller import Supervisor, AnsiCodes, Node
 import time
 import math
+from lib.utils import ElsirosConfigInterface, get_logger
 
 supervisor = Supervisor()
 time_step = int(supervisor.getBasicTimeStep())
@@ -15,10 +16,10 @@ robot_translation = supervisor.getFromDef('BLUE_PLAYER_1').getField('translation
 
 current_working_directory = Path.cwd()
 
+logger = get_logger(str(current_working_directory) + "\Sprint_log.txt")
+
 def uprint(*text):
-    with open(str(current_working_directory) + "\Marathon_log.txt",'a') as f:
-        print(*text, file = f)
-    print(*text )
+    logger.write(" ".join(list(map(str, text))) + "\n")
 
 os.chdir(current_working_directory.parent/'Robofest_TEAM')
 
@@ -37,6 +38,9 @@ with open(filename01, "w") as f01:
 distance_count = 0
 checkpoints = [0.3, 0, -0.3, 0]
 checkpoint_pass = [False, False, False, False]
+
+elsiros = ElsirosConfigInterface(supervisor)
+elsiros.enable_recording()
 
 while supervisor.step(time_step) != -1 :
     #message = 'robot position: ' + str(robot_translation.getSFVec3f()) + 'step: ' + str(supervisor.step(time_step))
@@ -57,7 +61,7 @@ while supervisor.step(time_step) != -1 :
     if x_coordinate >= checkpoints[3] and checkpoint_pass[2] : checkpoint_pass[3] = True
 
 p01.terminate()
-supervisor.simulationReset()
 supervisor.step(time_step)
-supervisor.simulationSetMode(supervisor.SIMULATION_MODE_PAUSE)
-#supervisor.worldReload()
+elsiros.stop_recording()
+supervisor.simulationQuit(0) 
+logger.close()
