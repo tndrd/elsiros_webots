@@ -15,6 +15,8 @@ from controller import Supervisor, AnsiCodes, Node
 from field import Field
 from gamestate import GameState
 
+from lib.utils import get_logger
+
 DISABLE_ACTUATORS_MIN_DURATION = 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
 STATUS_PRINT_PERIOD = 20                  # Real time between two status updates in seconds
 IN_PLAY_TIMEOUT = 10                      # time after which the ball is considered in play even if it was not kicked
@@ -44,7 +46,7 @@ supervisor = Supervisor()
 time_step = int(supervisor.getBasicTimeStep())
 time_count = 0
 
-log_file = open('log.txt', 'w')
+log_file = get_logger("log.txt")
 
 def distance2(v1, v2):
     return math.sqrt((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2)
